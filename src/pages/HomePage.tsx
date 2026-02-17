@@ -1,6 +1,6 @@
-import { Slider } from "antd";
+import { useEffect, useState } from "react";
+import { Select, Slider } from "antd";
 import type { ICarItem } from "../types/ICarItem.ts";
-import { useEffect, useState, type ChangeEvent } from "react";
 
 const HomePage = () => {
   //useState - спеціальний хук, який призначений для зберігання інформації
@@ -53,19 +53,20 @@ const HomePage = () => {
       </h1>
 
       <div className="flex mb-4 justify-between">
-        <select
-          onChange={(event: ChangeEvent<HTMLSelectElement>) =>
-            sortByPrice(event.target.value)
-          }
-          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 max-w-sm"
-        >
-          <option>Сортування за цінами</option>
-          <option value="asc">Від меншої до більшої</option>
-          <option value="desc">Від більшої до меншої</option>
-        </select>
+        {/* Select - це компонент Ant Design, який використовується для створення компонента вибору */}
+        <Select
+          defaultValue="default"
+          style={{ width: 200 }}
+          onChange={(value) => sortByPrice(value)}
+          options={[
+            { value: "default", label: "За замовчуванням" },
+            { value: "asc", label: "Від меншої до більшої" },
+            { value: "desc", label: "Від більшої до меншої" },
+          ]}
+        />
         <div className="w-full max-w-sm">
           <div className="text-gray-600">Фільтр за роками</div>
-          {/* Slider - це компонент, який використовується для створення слаљдера */}
+          {/* Slider - це компонент Ant Design, який використовується для створення слаљдера */}
           {/* range - це властивість, яка використовується для створення діапазону */}
           <Slider
             range={true}
@@ -78,7 +79,7 @@ const HomePage = () => {
       </div>
       {/* cars.length ? - це перевірка, чи масив cars не пустиий, якщо масив не пустий - виводиться список автомобілів */}
       {/* cars.map - це функція масиву, яка використовується для мапування масиву (змінює вихідні значення елементів масиву) */}
-      {/* key - це властивість, яка використовується для ідентифікації елементів масиву для покращення роботи DOM з масивами */}
+      {/* key - це властивість, яка використовується для ідентифікації елементів масиву для оптимізації роботи віртуального DOM з масивами */}
       {cars.length ? (
         cars.map((car) => (
           <div
@@ -116,9 +117,11 @@ const HomePage = () => {
                   {car.price} ₴
                 </div>
                 <div
-                  className={`h-8 w-8 rounded`}
+                  className={`h-8 w-16 rounded flex items-center justify-center`}
                   style={{ backgroundColor: car.color }}
-                />
+                >
+                  <p className="text-white text-sm">{`${car.color}`}</p>
+                </div>
                 <button
                   onClick={() => handleDeleteCar(car.id)}
                   className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
