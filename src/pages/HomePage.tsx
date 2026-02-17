@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { Select, Slider } from "antd";
 import type { ICarItem } from "../types/ICarItem.ts";
 
+const MIN_YEAR = 1950;
+const MAX_YEAR = 2026;
+
 const HomePage = () => {
   //useState - спеціальний хук, який призначений для зберігання інформації
   // cars - це масив, який зберігає інформацію типи ICarItem
@@ -10,7 +13,7 @@ const HomePage = () => {
   // render - це оновлення вмісту компонента
   const [cars, setCars] = useState<ICarItem[]>([]);
   // filters - це об'єкт, який зберігає інформацію про фільтри
-  const [filters, setFilters] = useState({ min: 1950, max: 2026 });
+  const [filters, setFilters] = useState({ min: MIN_YEAR, max: MAX_YEAR });
 
   useEffect(() => {
     const cars = JSON.parse(localStorage.getItem("cars") || "[]");
@@ -70,9 +73,9 @@ const HomePage = () => {
           {/* range - це властивість, яка використовується для створення діапазону */}
           <Slider
             range={true}
-            min={1950}
-            max={2026}
-            defaultValue={[1950, 2026]}
+            min={MIN_YEAR}
+            max={MAX_YEAR}
+            defaultValue={[MIN_YEAR, MAX_YEAR]}
             onChange={(value) => setFilters({ min: value[0], max: value[1] })}
           />
         </div>
