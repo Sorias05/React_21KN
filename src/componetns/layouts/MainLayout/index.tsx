@@ -30,10 +30,6 @@ const items1: MenuProps['items'] = [
         key: '3',
         label: <Link to="/register">Реєстрація</Link>,
     },
-    {
-        key: '4',
-        label: <Link to="/add-car">Додати авто</Link>,
-    }
 ];
 
 

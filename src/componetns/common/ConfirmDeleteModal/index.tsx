@@ -1,18 +1,24 @@
+// Тут знаходиться модальне вікно, яке буде зявлятися при підтвержені операції
 import { useState } from 'react'
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react'
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 
-const TestPage = () => {
+//Параметри вхід для модального вікна
+interface IConfirmDeleteModalProps {
+    confirmDeleteHandler: () => void //Відповідає за видалення
+}
+
+const ConfirmDeleteModal : React.FC<IConfirmDeleteModalProps> = ({confirmDeleteHandler}) => {
+
     const [open, setOpen] = useState(false)
 
     return (
-        <div>
-            <button
-                onClick={() => setOpen(true)}
-                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded cursor-pointer"
-            >
-                Open dialog
+        <>
+            <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded cursor-pointer"
+                onClick={() => setOpen(true)}>
+                Видалити
             </button>
+
             <Dialog open={open} onClose={setOpen} className="relative z-10">
                 <DialogBackdrop
                     transition
@@ -32,12 +38,11 @@ const TestPage = () => {
                                     </div>
                                     <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                                         <DialogTitle as="h3" className="text-base font-semibold text-white">
-                                            Deactivate account
+                                            Підтвердіть операцію
                                         </DialogTitle>
                                         <div className="mt-2">
                                             <p className="text-sm text-gray-400">
-                                                Are you sure you want to deactivate your account? All of your data will be permanently removed.
-                                                This action cannot be undone.
+                                                Ви дійсно бажаєте видалити?
                                             </p>
                                         </div>
                                     </div>
@@ -46,10 +51,14 @@ const TestPage = () => {
                             <div className="bg-gray-700/25 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
                                 <button
                                     type="button"
-                                    onClick={() => setOpen(false)}
+                                    onClick={() =>
+                                    {
+                                        confirmDeleteHandler();
+                                        setOpen(false)
+                                    }}
                                     className="inline-flex w-full justify-center rounded-md bg-red-500 px-3 py-2 text-sm font-semibold text-white hover:bg-red-400 sm:ml-3 sm:w-auto"
                                 >
-                                    Deactivate
+                                    Видалити
                                 </button>
                                 <button
                                     type="button"
@@ -57,15 +66,14 @@ const TestPage = () => {
                                     onClick={() => setOpen(false)}
                                     className="mt-3 inline-flex w-full justify-center rounded-md bg-white/10 px-3 py-2 text-sm font-semibold text-white inset-ring inset-ring-white/5 hover:bg-white/20 sm:mt-0 sm:w-auto"
                                 >
-                                    Cancel
+                                    Скасувати
                                 </button>
                             </div>
                         </DialogPanel>
                     </div>
                 </div>
             </Dialog>
-        </div>
+        </>
     )
 }
-
-export default TestPage;
+export default ConfirmDeleteModal;
