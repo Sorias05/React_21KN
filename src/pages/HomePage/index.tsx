@@ -1,9 +1,11 @@
 import type {ICarItem} from "../../types/ICarItem.ts";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {Select} from "antd";
 import ItemCar from "./ItemCar.tsx";
-import CreateCarItem from "./CreateCarItem.tsx";
-import type { ICreateCar } from "../../types/ICreateCar.ts";
+import CarForm from "./CarForm.tsx";
+import type { ICarForm } from "../../types/ICarForm.ts";
+
+const emptyCar: ICarItem = {id: 0, mark: "", model: "", description: "", image: "", price: 0, year: 0, color: ""};
 
 const HomePage = () =>
 {
@@ -54,6 +56,13 @@ const HomePage = () =>
             year: 2008
         },
     ]);
+    // selectedCar - це об'єкт, який зберігає обране нами авто для його оновлення
+    const [selectedCar, setSelectedCar] = useState<ICarItem>(emptyCar);
+
+    // при зміні масиву cars - очищаємо selectedCar за допомогою useEffect
+    useEffect(() => {
+        setSelectedCar(emptyCar);
+    }, [cars]);
 
     const sortByPrice = (value: string) => {
         // sort - функція списків, що сортує та змінює список за заданими значеннями
@@ -67,11 +76,16 @@ const HomePage = () =>
         }
     }
 
-    const addCarHandler = (car: ICreateCar) => {
+    const createCarHandler = (car: ICarForm) => {
         // генеруємо id для нового авто за допомогою математичних обчислень
         const id = cars.length > 0 ? Math.max(...cars.map(car => car.id)) + 1 : 1;
         // оновлюємо список авто, додаємо id в нове авто
         setCars(prev => [...prev, {...car, id}]);
+    }
+
+    const updateCarHandler = (id: number, car: ICarForm) => {
+        // оновлюємо список авто
+        setCars(prev => prev.map(item => item.id === id ? {...item, ...car} : item));
     }
 
     const deleteCarHandler = (id: number) => {
@@ -108,12 +122,12 @@ const HomePage = () =>
                         ]} />
             </div>
 
-            {/*передаємо функцію addCarHandler у дочірній компонент CreateCarItem*/}
-            <CreateCarItem onCreate={addCarHandler}/>
+            {/*передаємо стан selectedCar та функції createCarHandler, updateCarHandler у дочірній компонент CreateCarItem*/}
+            <CarForm selectedCar={selectedCar} onCreate={createCarHandler} onUpdate={updateCarHandler}/>
             {/*key - змінна для забезпечення ідентифікації списків у віртуальному DOM*/}
             {cars.map(car =>
                 <ItemCar key={car.id} car = {car}
-                    deleteCar={deleteCarHandler}/>
+                    deleteCar={deleteCarHandler} setSelectedCar={setSelectedCar}/>
             )}
 
         </>
