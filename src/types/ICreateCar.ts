@@ -1,6 +1,6 @@
 //Будемо проводити на основі даної моделі
 //Створення авто
-export interface ICarForm {
+export interface ICreateCar {
     model: string;
     mark: string;
     description: string;
