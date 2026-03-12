@@ -2,8 +2,8 @@ import type {ICarItem} from "../../types/ICarItem.ts";
 import {useState} from "react";
 import {Select} from "antd";
 import ItemCar from "./ItemCar.tsx";
-import CreateCarItem from "./CreateCarItem.tsx";
-import type {ICreateCar} from "../../types/ICreateCar.ts";
+import CarForm from "./CarForm.tsx";
+import type {ICarForm} from "../../types/ICarForm.ts";
 
 const emptyCar: ICarItem = {
     id: 0,
@@ -80,7 +80,7 @@ const HomePage = () =>
     }
 
     // функія для додавання авто в список
-    const addCarHandler = (car: ICreateCar) => {
+    const addCarHandler = (car: ICarForm) => {
         // генеруємо id за допомогою математичної операції max
         const id = cars.length > 0 ? Math.max(...cars.map(car => car.id)) + 1 : 1;
         // додаємо авто створивши новий список та переписавши старий
@@ -130,7 +130,7 @@ const HomePage = () =>
                         ]} />
             </div>
 
-            <CreateCarItem onCreate={addCarHandler} editCar={selectedCar} onEdit={editCarHandler}/>
+            <CarForm onCreate={addCarHandler} editCar={selectedCar} onEdit={editCarHandler}/>
             {/*key - змінна для забезпечення ідентифікації списків у віртуальному DOM*/}
             {cars.map(car =>
                 <ItemCar key={car.id} car = {car}

@@ -1,17 +1,22 @@
-import type {ICreateCar} from "../../types/ICreateCar.ts";
-import {Button, Form, type FormProps, Input} from "antd";
+import type {ICarForm} from "../../types/ICarForm.ts";
+import {Button, Form, type FormProps, Input, Upload} from "antd";
 import type {ICarItem} from "../../types/ICarItem.ts";
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
+import ImageCropper from "../../componetns/common/ImageCropper/index.tsx";
 
 interface Props {
-    onCreate: (car: ICreateCar) => void;
+    onCreate: (car: ICarForm) => void;
     editCar?: ICarItem; // відповідає за зміну авто
     onEdit: (car: ICarItem) => void; // якщо відбувається зміна авто
 }
 
-const CreateCarItem = ({ onCreate, editCar, onEdit }: Props) => {
+const CarForm = ({ onCreate, editCar, onEdit }: Props) => {
+    const [form] = Form.useForm<ICarForm>();
+    // стан для збереження зображення перед обрізанням
+    const [previewImage, setPreviewImage] = useState<string | null>(null);
+    // стан для відображення модального вікна
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const [form] = Form.useForm<ICreateCar>();
     useEffect(() => {
             if(editCar)
             {
@@ -33,7 +38,22 @@ const CreateCarItem = ({ onCreate, editCar, onEdit }: Props) => {
 
     console.log("editCar", editCar);
 
-    const onHandlerSubmit = (values: ICreateCar) => {
+    const handleSelectFile = (file: File) => {
+        // якщо файл не існує, то виходимо
+        if (!file) return;
+
+        // викликаємо FileReader
+        const reader = new FileReader();
+        // перетворюємо зображення у Base64
+        reader.readAsDataURL(file);
+        // після завершення перетворення записуємо його в previewImage та відкриваємо модальне вікно
+        reader.onload = () => {
+            setPreviewImage(reader.result as string);
+            setIsModalOpen(true);
+        };
+    }
+
+    const onHandlerSubmit = (values: ICarForm) => {
         console.log("Submit form", values);
         if(editCar) {
             if(editCar.id!=0)
@@ -59,7 +79,8 @@ const CreateCarItem = ({ onCreate, editCar, onEdit }: Props) => {
 
     return (
         <>
-            <h2 className={"text-green-500 text-center text-3xl "}>Створення авто</h2>
+            {/*Умовний рендеринг заголовку*/}
+            <h2 className={"text-green-500 text-center text-3xl "}>{editCar && editCar.id != 0 ? "Редагування авто" : "Створення авто"}</h2>
             <div className="mt-4">
                 <Form form={form}
                       {...formItemLayout}
@@ -67,14 +88,14 @@ const CreateCarItem = ({ onCreate, editCar, onEdit }: Props) => {
                       layout={"horizontal"}
                 >
                     <div className="grid grid-cols-3 gap-2">
-                        <Form.Item<ICreateCar>
+                        <Form.Item<ICarForm>
                             label={"Марка"}
                             name={"mark"}
                             rules={[{required: true, message: "Вкажіть марку"}]}
                         >
                             <Input/>
                         </Form.Item>
-                        <Form.Item<ICreateCar>
+                        <Form.Item<ICarForm>
                             label={"Модель"}
                             name={"model"}
                             rules={[{required: true, message: "Вкажіть модель"}]}
@@ -82,7 +103,7 @@ const CreateCarItem = ({ onCreate, editCar, onEdit }: Props) => {
                             <Input/>
                         </Form.Item>
 
-                        <Form.Item<ICreateCar>
+                        <Form.Item<ICarForm>
                             label={"Колір"}
                             name={"color"}
                             rules={[{required: true, message: "Вкажіть колір"}]}
@@ -90,7 +111,7 @@ const CreateCarItem = ({ onCreate, editCar, onEdit }: Props) => {
                             <Input/>
                         </Form.Item>
 
-                        <Form.Item<ICreateCar>
+                        <Form.Item<ICarForm>
                             label={"Рік"}
                             name={"year"}
                             rules={[{required: true, message: "Вкажіть рік"}]}
@@ -98,7 +119,7 @@ const CreateCarItem = ({ onCreate, editCar, onEdit }: Props) => {
                             <Input/>
                         </Form.Item>
 
-                        <Form.Item<ICreateCar>
+                        <Form.Item<ICarForm>
                             label={"Ціна"}
                             name={"price"}
                             rules={[{required: true, message: "Вкажіть ціну"}]}
@@ -107,7 +128,7 @@ const CreateCarItem = ({ onCreate, editCar, onEdit }: Props) => {
                         </Form.Item>
 
 
-                            <Form.Item<ICreateCar>
+                            <Form.Item<ICarForm>
                                 label={"Опис"}
                                 name={"description"}
                                 rules={[{required: true, message: "Вкажіть опис"}]}
@@ -115,27 +136,59 @@ const CreateCarItem = ({ onCreate, editCar, onEdit }: Props) => {
                                 <Input/>
                             </Form.Item>
 
-                        <Form.Item<ICreateCar>
+                        <Form.Item<ICarForm>
                             label={"Фото"}
                             name={"image"}
                             rules={[{required: true, message: "Вкажіть фото"}]}
                         >
-                            <Input/>
+                            <Upload
+                                maxCount={1}
+                                showUploadList={false}
+                                beforeUpload={(file) => {
+                                    handleSelectFile(file);
+                                    return false;
+                                }}
+                            >
+                                <Button>Оберіть фото</Button>
+                            </Upload>
                         </Form.Item>
 
                         <div className={"flex justify-center"}>
                             <Form.Item label = {null}>
                                 <Button type={"primary"} htmlType={"submit"}>
-                                    Створити авто
+                                    {/*умовний рендеринг для кнопки*/}
+                                    {editCar && editCar.id != 0 ? "Оновити авто" : "Створити авто"}
                                 </Button>
                             </Form.Item>
                         </div>
+
+                        {/*показуємо обрізане зображення, якщо воно є*/}
+                        {form.getFieldValue("image") && (
+                            <div className="mt-4 flex justify-center">
+                                <img
+                                    src={form.getFieldValue("image")}
+                                    alt="Preview"
+                                    className="w-40 h-40 object-cover rounded-lg border"
+                                />
+                            </div>
+                        )}
                     </div>
 
                 </Form>
+                {/*модальне вікно для обрізки зображення*/}
+                <ImageCropper
+                    isOpen={isModalOpen} 
+                    setIsOpen={setIsModalOpen} 
+                    image={previewImage || ""} 
+                    // передаємо функцію збереження обрізаного зображення у форму дочірньому компоненту
+                    onCrop={(base64: string) => {
+                        form.setFieldsValue({ image: base64 });
+                        setPreviewImage(null);
+                    }}
+                />
             </div>
         </>
 )
 }
 
-export default CreateCarItem;
+export default CarForm;
